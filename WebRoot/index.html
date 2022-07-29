@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <meta charset="UTF-8">
+    <title>3D Tiles 查看器</title>
+    <script src="Scripts/jquery-3.3.1.min.js"></script>
+    <script src="Scripts/Cesium/Cesium.js"></script>
+    <link href="Scripts/Cesium/Widgets/widgets.css" rel="stylesheet" />
+    <style>
+        html, body, #cesiumContainer {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .float_box_discover {
+            background-color: transparent;
+            width: 320px;
+            height: 35px;
+            text-align: left;
+            position: absolute;
+            top: 15px;
+            left: 10px;
+            z-index: 1000;
+        }
+
+        .filetext {
+            /*height: 18px;*/
+        }
+
+        .change_btn {
+            /*height: 20px;*/
+        }
+    </style>
+    <script>
+        var viewer = null;
+        $(document).ready(function () {
+            $(".change_btn").click(function () {
+                //调用后台
+                Formium.external.localrun.OpenModelSelect();
+            });
+            Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI5YzA2YzllNi03YTc4LTQzODMtYmEyYy1jNjU5YzMyMTBiNDYiLCJpZCI6OTA1MTYsImlhdCI6MTY1MDQyMjY1NH0.F8zLSyC7rbKqhy19a4WN_wVhE3R0MAq_K9y-m8MfKcs";
+            viewer = new Cesium.Viewer("cesiumContainer", {
+                terrainProvider: Cesium.createWorldTerrain(),
+                imageryProvider: new Cesium.TileMapServiceImageryProvider({
+                    url: Cesium.buildModuleUrl("Assets/Textures/NaturalEarthII")
+                }),
+                animation: false, //是否显示动画控件(左下方那个)
+                baseLayerPicker: false, //是否显示图层选择控件
+                geocoder: false, //是否显示地名查找控件
+                timeline: false, //是否显示时间线控件
+                sceneModePicker: true, //是否显示投影方式控件
+                navigationHelpButton: false, //是否显示帮助信息控件
+                infoBox: true, //是否显示点击要素之后显示的信息
+                homeButton: false,
+                fullscreenButton: false,
+                fulllscreenButtond: false,
+                vrButton: false
+            });
+            viewer._cesiumWidget._creditContainer.style.display = "none";
+
+            // 倾斜视图 鼠标中键右键旋转
+            viewer.scene.screenSpaceCameraController.tiltEventTypes = [Cesium.CameraEventType.MIDDLE_DRAG, Cesium.CameraEventType.RIGHT_DRAG];
+
+            // 缩放设置 重新设置缩放成员 滚轮和触摸
+            viewer.scene.screenSpaceCameraController.zoomEventTypes = [Cesium.CameraEventType.WHEEL, Cesium.CameraEventType.PINCH];
+
+            // 偏斜平移
+            //viewer.scene.screenSpaceCameraController.lookEventTypes = [Cesium.CameraEventType.LEFT_DRAG]
+
+            // 平移 添加鼠标左键  鼠标左键平移
+            viewer.scene.screenSpaceCameraController.rotateEventTypes = [Cesium.CameraEventType.LEFT_DRAG]
+        });
+
+        //function changeHeight(height) {
+        //    height = Number(height);
+        //    if (isNaN(height)) {
+        //        return;
+        //    }
+        //    var cartographic = Cesium.Cartographic.fromCartesian(tileset.boundingSphere.center);
+        //    var surface = Cesium.Cartesian3.fromRadians(cartographic.longitude, cartographic.latitude, cartographic.height);
+        //    var offset = Cesium.Cartesian3.fromRadians(cartographic.longitude, cartographic.latitude, height);
+        //    var translation = Cesium.Cartesian3.subtract(offset, surface, new Cesium.Cartesian3());
+        //    tileset.modelMatrix = Cesium.Matrix4.fromTranslation(translation);
+        //}
+
+
+        function loadmodel(modelpath) {
+            var modelurl = "http://model.app.local/" + modelpath + "/tileset.json";
+            const tileset = new Cesium.Cesium3DTileset({
+                url: modelurl,
+                skipLevelOfDetail: false,
+                skipLevels: 2,
+                preferLeaves: true,
+                maximumMemoryUsage: 2048,
+                maximumNumberOfLoadedTiles: 10000,
+            });
+            tileset.tileFailed.addEventListener(function (error) {
+                console.log('An error occurred loading tile: ' + error.url);
+                console.log('Error: ' + error.message);
+                alert('Error: ' + error.message);
+            });
+            viewer.scene.primitives.add(tileset);
+            viewer.zoomTo(tileset);
+        }
+
+        function setModelPath(fpath) {
+            $('.filetext').val(fpath);
+        }
+    </script>
+</head>
+<body>
+    <div class="float_box_discover">
+        <input type="text" class="filetext" readonly="readonly" />
+        <button class="change_btn">选择模型文件</button>
+    </div>
+    <div id="cesiumContainer"></div>
+</body>
+</html>
