@@ -42,9 +42,7 @@
                 //调用后台
                 Formium.external.localrun.OpenModelSelect();
             });
-            Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI5YzA2YzllNi03YTc4LTQzODMtYmEyYy1jNjU5YzMyMTBiNDYiLCJpZCI6OTA1MTYsImlhdCI6MTY1MDQyMjY1NH0.F8zLSyC7rbKqhy19a4WN_wVhE3R0MAq_K9y-m8MfKcs";
             viewer = new Cesium.Viewer("cesiumContainer", {
-                terrainProvider: Cesium.createWorldTerrain(),
                 imageryProvider: new Cesium.TileMapServiceImageryProvider({
                     url: Cesium.buildModuleUrl("Assets/Textures/NaturalEarthII")
                 }),
@@ -74,18 +72,6 @@
             // 平移 添加鼠标左键  鼠标左键平移
             viewer.scene.screenSpaceCameraController.rotateEventTypes = [Cesium.CameraEventType.LEFT_DRAG]
         });
-
-        //function changeHeight(height) {
-        //    height = Number(height);
-        //    if (isNaN(height)) {
-        //        return;
-        //    }
-        //    var cartographic = Cesium.Cartographic.fromCartesian(tileset.boundingSphere.center);
-        //    var surface = Cesium.Cartesian3.fromRadians(cartographic.longitude, cartographic.latitude, cartographic.height);
-        //    var offset = Cesium.Cartesian3.fromRadians(cartographic.longitude, cartographic.latitude, height);
-        //    var translation = Cesium.Cartesian3.subtract(offset, surface, new Cesium.Cartesian3());
-        //    tileset.modelMatrix = Cesium.Matrix4.fromTranslation(translation);
-        //}
 
 
         function loadmodel(modelpath) {
